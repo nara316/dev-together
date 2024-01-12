@@ -1,7 +1,7 @@
-package domain;
+package com.project.devtogether.domain;
 
-import domain.enums.MemberRole;
-import domain.enums.MemberStatus;
+import com.project.devtogether.domain.enums.MemberRole;
+import com.project.devtogether.domain.enums.MemberStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +15,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.NumberFormat;
 
 @Getter
 @ToString
