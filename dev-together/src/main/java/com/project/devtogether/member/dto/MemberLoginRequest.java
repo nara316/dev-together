@@ -1,5 +1,9 @@
 package com.project.devtogether.member.dto;
 
-public record MemberLoginRequest(String email, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record MemberLoginRequest(
+        @NotBlank String email,
+        @NotBlank String password) {
 
 }

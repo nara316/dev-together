@@ -28,4 +28,10 @@ public class Api<T> {
         api.result = Result.ERROR(errorCodeIfs);
         return api;
     }
+
+    public static Api<Object> ERROR(ErrorCodeIfs errorCodeIfs, String description){
+        var api = new Api<Object>();
+        api.result = Result.ERROR(errorCodeIfs, description);
+        return api;
+    }
 }
