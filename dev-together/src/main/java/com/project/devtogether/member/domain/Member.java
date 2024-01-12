@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @ToString
+@EqualsAndHashCode
 @Entity
 public class Member {
 
@@ -50,11 +52,28 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private LocalDateTime createAt;
 
-
+    @Setter
+    @Column(nullable = false)
     private LocalDateTime lastLoginAt;
+
+    protected Member() {}
+
+    private Member(String email, String password, String name, String nickName, String introduce) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.nickName = nickName;
+        this.introduce = introduce;
+        this.role = MemberRole.USER;
+        this.status = MemberStatus.REGISTERED;
+        this.createAt = LocalDateTime.now();
+        this.lastLoginAt = LocalDateTime.now();
+    }
+
+    public static Member of(String email, String password, String name, String nickName, String introduce) {
+        return new Member(email, password, name, nickName, introduce);
+    }
 }
