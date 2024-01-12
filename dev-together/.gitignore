@@ -223,3 +223,7 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij+all,windows,macos,visualstudiocode,gradle
 
 .DS_Store
+
+*.yaml
+*.yml
+application.yaml
