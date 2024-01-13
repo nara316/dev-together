@@ -2,6 +2,7 @@ package com.project.devtogether.member.service;
 
 import com.project.devtogether.common.error.ErrorCode;
 import com.project.devtogether.common.exception.ApiException;
+import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.common.token.dto.TokenDto;
 import com.project.devtogether.common.token.privider.JwtTokenProvider;
 import com.project.devtogether.member.domain.Member;
@@ -9,7 +10,11 @@ import com.project.devtogether.member.domain.MemberRepository;
 import com.project.devtogether.member.dto.MemberLoginRequest;
 import com.project.devtogether.member.dto.MemberRegisterRequest;
 import com.project.devtogether.member.dto.MemberResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
+import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -20,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -46,6 +52,20 @@ public class MemberService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         TokenDto token = jwtTokenProvider.issueToken(authentication);
         return token;
+    }
+
+    @Transactional(readOnly = true)
+    public MemberResponse readMember(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+        return MemberResponse.of(member);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberResponse readMe() {
+        String currentUserEmail = SecurityUtil.getCurrentUserEmail();
+        Member member = memberRepository.findFirstByEmail(currentUserEmail)
+                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+        return MemberResponse.of(member);
     }
 
     private boolean isDuplicatedEmail(String email) {
