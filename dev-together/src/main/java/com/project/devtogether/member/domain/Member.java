@@ -2,6 +2,7 @@ package com.project.devtogether.member.domain;
 
 import com.project.devtogether.member.domain.enums.MemberRole;
 import com.project.devtogether.member.domain.enums.MemberStatus;
+import com.project.devtogether.project.domain.Project;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,24 +10,23 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @ToString
 @EqualsAndHashCode
 @Entity
-public class Member implements UserDetails {
+public class Member{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(length = 50, nullable = false)
@@ -62,6 +62,9 @@ public class Member implements UserDetails {
     @Column(nullable = false)
     private LocalDateTime lastLoginAt;
 
+    @OneToMany(mappedBy = "member")
+    private List<Project> projects = new ArrayList<>();
+
     protected Member() {}
 
     private Member(String email, String password, String name, String nickName, String introduce) {
@@ -78,40 +81,5 @@ public class Member implements UserDetails {
 
     public static Member of(String email, String password, String name, String nickName, String introduce) {
         return new Member(email, password, name, nickName, introduce);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getDescription()));
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }
