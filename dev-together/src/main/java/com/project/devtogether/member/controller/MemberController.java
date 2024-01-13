@@ -1,6 +1,7 @@
 package com.project.devtogether.member.controller;
 
 import com.project.devtogether.common.api.Api;
+import com.project.devtogether.common.token.dto.TokenDto;
 import com.project.devtogether.member.dto.MemberLoginRequest;
 import com.project.devtogether.member.dto.MemberRegisterRequest;
 import com.project.devtogether.member.dto.MemberResponse;
@@ -29,11 +30,11 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public Api<MemberResponse> login(
+    public Api<TokenDto> login(
             @Valid
             @RequestBody Api<MemberLoginRequest> request
     ) {
-        MemberResponse response = memberService.login(request.getBody());
-        return Api.OK(response);
+        TokenDto token = memberService.login(request.getBody());
+        return Api.OK(token);
     }
 }
