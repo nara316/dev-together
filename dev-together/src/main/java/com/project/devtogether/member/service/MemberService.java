@@ -10,6 +10,7 @@ import com.project.devtogether.member.domain.MemberRepository;
 import com.project.devtogether.member.dto.MemberLoginRequest;
 import com.project.devtogether.member.dto.MemberRegisterRequest;
 import com.project.devtogether.member.dto.MemberResponse;
+import com.project.devtogether.member.dto.MemberUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -62,13 +63,25 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberResponse readMe() {
-        String currentUserEmail = SecurityUtil.getCurrentUserEmail();
-        Member member = memberRepository.findFirstByEmail(currentUserEmail)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+        Member member = getMemberBySecurity();
+        return MemberResponse.of(member);
+    }
+
+    public MemberResponse updateMe(MemberUpdateRequest memberUpdateRequest) {
+        Member member = getMemberBySecurity();
+        member.setNickName(memberUpdateRequest.nickName());
+        member.setIntroduce(memberUpdateRequest.introduce());
         return MemberResponse.of(member);
     }
 
     private boolean isDuplicatedEmail(String email) {
         return memberRepository.findFirstByEmail(email).isPresent();
+    }
+
+    private Member getMemberBySecurity() {
+        String currentUserEmail = SecurityUtil.getCurrentUserEmail();
+        Member member = memberRepository.findFirstByEmail(currentUserEmail)
+                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+        return member;
     }
 }

@@ -6,6 +6,7 @@ import com.project.devtogether.common.token.dto.TokenDto;
 import com.project.devtogether.member.dto.MemberLoginRequest;
 import com.project.devtogether.member.dto.MemberRegisterRequest;
 import com.project.devtogether.member.dto.MemberResponse;
+import com.project.devtogether.member.dto.MemberUpdateRequest;
 import com.project.devtogether.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -28,18 +29,18 @@ public class MemberController {
     @PostMapping("/register")
     public Api<MemberResponse> register(
             @Valid
-            @RequestBody Api<MemberRegisterRequest> request
+            @RequestBody MemberRegisterRequest request
     ) {
-        MemberResponse response = memberService.register(request.getBody());
+        MemberResponse response = memberService.register(request);
         return Api.OK(response);
     }
 
     @PostMapping("/login")
     public Api<TokenDto> login(
             @Valid
-            @RequestBody Api<MemberLoginRequest> request
+            @RequestBody MemberLoginRequest request
     ) {
-        TokenDto token = memberService.login(request.getBody());
+        TokenDto token = memberService.login(request);
         return Api.OK(token);
     }
 
@@ -52,6 +53,12 @@ public class MemberController {
     @GetMapping("/me")
     public Api<MemberResponse> readMe() {
         MemberResponse result = memberService.readMe();
+        return Api.OK(result);
+    }
+
+    @PatchMapping("/me")
+    public Api<MemberResponse> updateMe(MemberUpdateRequest request) {
+        MemberResponse result = memberService.updateMe(request);
         return Api.OK(result);
     }
 }
