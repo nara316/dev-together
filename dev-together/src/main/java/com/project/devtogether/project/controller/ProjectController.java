@@ -1,6 +1,7 @@
 package com.project.devtogether.project.controller;
 
 import com.project.devtogether.common.api.Api;
+import com.project.devtogether.common.error.ErrorCode;
 import com.project.devtogether.member.dto.MemberResponse;
 import com.project.devtogether.project.dto.ProjectRegisterRequest;
 import com.project.devtogether.project.dto.ProjectResponse;
@@ -8,6 +9,7 @@ import com.project.devtogether.project.dto.ProjectUpdateRequest;
 import com.project.devtogether.project.service.ProjectService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,9 +42,15 @@ public class ProjectController {
         return Api.OK(result);
     }
 
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     public Api<ProjectResponse> updateProject(@PathVariable Long id, ProjectUpdateRequest request) {
         ProjectResponse result = projectService.updateProject(id, request);
         return Api.OK(result);
+    }
+
+    @DeleteMapping("/{id}")
+    public Api<?> deleteProject(@PathVariable Long id) {
+        projectService.deleteProject(id);
+        return Api.OK("삭제가 완료되었습니다.");
     }
 }

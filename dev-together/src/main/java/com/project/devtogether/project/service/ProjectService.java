@@ -36,8 +36,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public ProjectResponse readProject(Long id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 게시글을 찾을 수 없습니다."));
+        Project project = getProjectById(id);
         return ProjectResponse.of(project);
     }
 
@@ -51,12 +50,9 @@ public class ProjectService {
 
     public ProjectResponse updateProject(Long id, ProjectUpdateRequest request) {
         Member member = getReferenceBySecurity();
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 게시글을 찾을 수 없습니다."));
+        Project project = getProjectById(id);
+        checkQualifiedBySecurity(member.getId(), project.getMember().getId());
 
-        if (member.getId() != project.getMember().getId()) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "해당 권한이 없습니다.");
-        }
         project.setContent(request.content());
         project.setStatus(ProjectStatus.getStatusByInput(request.status()));
         project.setModifiedAt(LocalDateTime.now());
@@ -64,7 +60,26 @@ public class ProjectService {
         return ProjectResponse.of(project);
     }
 
+    public void deleteProject(Long id) {
+        Member member = getReferenceBySecurity();
+        Project project = getProjectById(id);
+        checkQualifiedBySecurity(member.getId(), project.getMember().getId());
+
+        memberRepository.deleteById(project.getId());
+    }
+
     private Member getReferenceBySecurity() {
         return memberRepository.getReferenceById(SecurityUtil.getCurrentUserId());
+    }
+
+    private Project getProjectById(Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 게시글을 찾을 수 없습니다."));
+    }
+
+    private void checkQualifiedBySecurity(Long securityId, Long projectId) {
+        if (securityId != projectId) {
+            throw new ApiException(ErrorCode.BAD_REQUEST, "해당 권한이 없습니다.");
+        }
     }
 }
