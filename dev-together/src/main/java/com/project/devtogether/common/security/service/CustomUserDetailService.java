@@ -25,7 +25,7 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findFirstByEmail(username)
                 .map(this::createUserDetails)
-                .orElseThrow(() -> new ApiException(ErrorCode.SERVER_ERROR, "해당ㄹ하는 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(ErrorCode.SERVER_ERROR, "해당하는 유저를 찾을 수 없습니다."));
     }
 
     private CustomUserDetail createUserDetails(Member member) {
