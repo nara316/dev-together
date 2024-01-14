@@ -16,8 +16,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +25,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Project {
 
@@ -48,8 +48,8 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
-    @OneToMany(mappedBy = "project", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ProjectSkill> projectSkills = new ArrayList<>();
+    @OneToMany(mappedBy = "project")
+    private Set<ProjectSkill> projectSkills = new LinkedHashSet<>();
 
     @Column(nullable = false)
     private LocalDateTime registeredAt;

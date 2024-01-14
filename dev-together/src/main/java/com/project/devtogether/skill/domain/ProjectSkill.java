@@ -14,7 +14,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 @Entity
 public class ProjectSkill {
 

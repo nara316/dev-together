@@ -38,7 +38,6 @@ public class ProjectService {
         Project project = Project.of(member, request.title(), request.content());
         projectRepository.save(project);
 
-        //스킬
         List<String> skills = request.skills();
         for (String skill : skills) {
             Skill findSkill = skillRepository.findById(Long.parseLong(skill))
@@ -72,6 +71,17 @@ public class ProjectService {
         project.setStatus(ProjectStatus.getStatusByInput(request.status()));
         project.setModifiedAt(LocalDateTime.now());
         project.setModifiedBy(member.getNickName());
+
+        //projectSkill (삭제 -> 다시 SAVE?)
+        projectSkillRepository.deleteAllByProjectId(project.getId());
+        List<String> updateSkills = request.skills();
+        for (String skill : updateSkills) {
+            Skill findSkill = skillRepository.findById(Long.parseLong(skill))
+                    .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 스킬을 찾을 수 없습니다."));
+            ProjectSkill projectSkill = ProjectSkill.of(project, findSkill);
+            projectSkillRepository.save(projectSkill);
+        }
+
         return ProjectResponse.of(project);
     }
 
@@ -80,7 +90,7 @@ public class ProjectService {
         Project project = getProjectById(id);
         checkQualifiedBySecurity(member.getId(), project.getMember().getId());
 
-        memberRepository.deleteById(project.getId());
+        projectRepository.deleteById(project.getId());
     }
 
     private Member getReferenceBySecurity() {

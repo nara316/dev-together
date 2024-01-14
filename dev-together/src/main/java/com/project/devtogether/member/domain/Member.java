@@ -22,12 +22,11 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Member{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @Column(length = 50, nullable = false)
@@ -63,7 +62,7 @@ public class Member{
     @Column(nullable = false)
     private LocalDateTime lastLoginAt;
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member")
     private List<Project> projects = new ArrayList<>();
 
     protected Member() {}
