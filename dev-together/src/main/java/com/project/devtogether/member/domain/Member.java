@@ -3,6 +3,7 @@ package com.project.devtogether.member.domain;
 import com.project.devtogether.member.domain.enums.MemberRole;
 import com.project.devtogether.member.domain.enums.MemberStatus;
 import com.project.devtogether.project.domain.Project;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -62,7 +63,7 @@ public class Member{
     @Column(nullable = false)
     private LocalDateTime lastLoginAt;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Project> projects = new ArrayList<>();
 
     protected Member() {}

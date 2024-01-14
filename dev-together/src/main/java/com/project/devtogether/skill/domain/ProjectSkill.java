@@ -28,4 +28,23 @@ public class ProjectSkill {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "skill_id")
     private Skill skill;
+
+    protected ProjectSkill() {}
+
+    private ProjectSkill(Project project, Skill skill) {
+        setProject(project);
+        this.skill = skill;
+    }
+
+    public static ProjectSkill of(Project project, Skill skill) {
+        return new ProjectSkill(project, skill);
+    }
+
+    /*
+     * 연관관계 메서드
+     */
+    public void setProject(Project project) {
+        this.project = project;
+        project.getProjectSkills().add(this);
+    }
 }
