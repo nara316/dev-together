@@ -25,10 +25,9 @@ import lombok.ToString;
 public class Project {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
@@ -39,6 +38,7 @@ public class Project {
     @Column(length = 500, nullable = false)
     private String content;
 
+    @Setter
     @Column(length = 25, nullable = false)
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
@@ -62,21 +62,14 @@ public class Project {
         this.member = member;
         this.title = title;
         this.content = content;
-        this.status = ProjectStatus.REGISTERED;
+        this.status = ProjectStatus.ENROLLING;
         this.registeredAt = LocalDateTime.now();
-        this.registeredBy = checkNickNameIsExisted(member);
+        this.registeredBy = member.getNickName();
         this.modifiedAt = LocalDateTime.now();
-        this.modifiedBy = checkNickNameIsExisted(member);
+        this.modifiedBy = member.getNickName();
     }
 
     public static Project of(Member member, String title, String content) {
         return new Project(member, title, content);
-    }
-
-    private String checkNickNameIsExisted(Member member) {
-        if (member.getNickName() == null) {
-            return member.getName();
-        }
-        return member.getNickName();
     }
 }

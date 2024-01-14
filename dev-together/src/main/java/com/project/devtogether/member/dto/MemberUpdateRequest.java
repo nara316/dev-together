@@ -1,7 +1,9 @@
 package com.project.devtogether.member.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record MemberUpdateRequest (
-        String nickName,
+        @NotBlank String nickName,
         String introduce
 ){
 }

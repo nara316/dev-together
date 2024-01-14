@@ -71,7 +71,7 @@ public class Member{
         this.email = email;
         this.password = password;
         this.name = name;
-        this.nickName = nickName;
+        this.nickName = generateNickName(name, nickName);
         this.introduce = introduce;
         this.role = MemberRole.USER;
         this.status = MemberStatus.REGISTERED;
@@ -81,5 +81,12 @@ public class Member{
 
     public static Member of(String email, String password, String name, String nickName, String introduce) {
         return new Member(email, password, name, nickName, introduce);
+    }
+
+    private String generateNickName(String name, String nickName) {
+        if (nickName == null) {
+            return name;
+        }
+        return nickName;
     }
 }
