@@ -90,6 +90,8 @@ public class ProjectService {
         Project project = getProjectById(id);
         checkQualifiedBySecurity(member.getId(), project.getMember().getId());
 
+        //ProjectSkill도 삭제
+        projectSkillRepository.deleteAllByProjectId(project.getId());
         projectRepository.deleteById(project.getId());
     }
 
