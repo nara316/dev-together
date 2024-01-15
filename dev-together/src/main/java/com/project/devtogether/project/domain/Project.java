@@ -2,6 +2,8 @@ package com.project.devtogether.project.domain;
 
 import com.project.devtogether.member.domain.Member;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
+import com.project.devtogether.skill.domain.ProjectSkill;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,7 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +25,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Project {
 
@@ -43,6 +48,9 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
+    @OneToMany(mappedBy = "project")
+    private Set<ProjectSkill> projectSkills = new LinkedHashSet<>();
+
     @Column(nullable = false)
     private LocalDateTime registeredAt;
 
@@ -59,7 +67,7 @@ public class Project {
     protected Project() {}
 
     private Project(Member member, String title, String content) {
-        this.member = member;
+        setMember(member);
         this.title = title;
         this.content = content;
         this.status = ProjectStatus.ENROLLING;
@@ -71,5 +79,13 @@ public class Project {
 
     public static Project of(Member member, String title, String content) {
         return new Project(member, title, content);
+    }
+
+    /*
+     * 연관관계 메서드
+     */
+    public void setMember(Member member) {
+        this.member = member;
+        member.getProjects().add(this);
     }
 }

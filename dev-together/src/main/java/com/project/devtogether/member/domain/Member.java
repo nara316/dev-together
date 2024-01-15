@@ -3,6 +3,7 @@ package com.project.devtogether.member.domain;
 import com.project.devtogether.member.domain.enums.MemberRole;
 import com.project.devtogether.member.domain.enums.MemberStatus;
 import com.project.devtogether.project.domain.Project;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,12 +22,11 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Member{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @Column(length = 50, nullable = false)
