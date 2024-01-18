@@ -45,6 +45,6 @@ public class ProjectSkill {
      */
     public void setProject(Project project) {
         this.project = project;
-        project.getProjectSkills().add(this);
+        project.getSkills().add(this);
     }
 }

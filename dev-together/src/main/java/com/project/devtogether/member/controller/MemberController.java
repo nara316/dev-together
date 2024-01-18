@@ -44,8 +44,8 @@ public class MemberController {
         return Api.OK(token);
     }
 
-    @GetMapping("/{id}")
-    public Api<MemberResponse> readMember(@PathVariable Long id) {
+    @GetMapping("{id}")
+    public Api<MemberResponse> readMember(@PathVariable("id") Long id) {
         MemberResponse result = memberService.readMember(id);
         return Api.OK(result);
     }

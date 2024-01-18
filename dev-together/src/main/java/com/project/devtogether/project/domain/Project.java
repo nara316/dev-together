@@ -3,7 +3,6 @@ package com.project.devtogether.project.domain;
 import com.project.devtogether.member.domain.Member;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
 import com.project.devtogether.skill.domain.ProjectSkill;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,8 +15,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +48,7 @@ public class Project {
     private ProjectStatus status;
 
     @OneToMany(mappedBy = "project")
-    private Set<ProjectSkill> projectSkills = new LinkedHashSet<>();
+    private List<ProjectSkill> skills = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime registeredAt;

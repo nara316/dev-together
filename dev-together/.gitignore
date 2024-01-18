@@ -227,3 +227,4 @@ gradle-app.setting
 *.yaml
 *.yml
 application.yaml
+**/generated

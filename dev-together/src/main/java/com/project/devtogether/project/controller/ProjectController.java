@@ -1,8 +1,7 @@
 package com.project.devtogether.project.controller;
 
 import com.project.devtogether.common.api.Api;
-import com.project.devtogether.common.error.ErrorCode;
-import com.project.devtogether.member.dto.MemberResponse;
+import com.project.devtogether.project.dto.ProjectDto;
 import com.project.devtogether.project.dto.ProjectRegisterRequest;
 import com.project.devtogether.project.dto.ProjectResponse;
 import com.project.devtogether.project.dto.ProjectUpdateRequest;
@@ -30,9 +29,12 @@ public class ProjectController {
         return Api.OK(result);
     }
 
-    @GetMapping("/{id}")
-    public Api<ProjectResponse> readProject(@PathVariable Long id) {
-        ProjectResponse result = projectService.readProject(id);
+    /*
+    * intelliJ로 빌드하니 부트 3.2 부터는 바이트코드를 파싱하지 않는다. -parameters 옵션을 생략하지 않기로 결정
+    * */
+    @GetMapping("{id}")
+    public Api<List<ProjectDto>> readProject(@PathVariable("id") Long id) {
+        List<ProjectDto> result = projectService.readProject(id);
         return Api.OK(result);
     }
 
@@ -42,14 +44,23 @@ public class ProjectController {
         return Api.OK(result);
     }
 
-    @PatchMapping("/{id}")
-    public Api<ProjectResponse> updateProject(@PathVariable Long id, ProjectUpdateRequest request) {
+//    @GetMapping()
+//    public Api<List<ProjectResponse>> readProjects(
+//            @RequestParam(required = false) SearchType searchType, //검색타입
+//            @RequestParam(required = false) String searchValue, //검색어
+//            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+//    ) {
+//        return Api.OK(result);
+//    }
+
+    @PatchMapping("{id}")
+    public Api<ProjectResponse> updateProject(@PathVariable("id") Long id, ProjectUpdateRequest request) {
         ProjectResponse result = projectService.updateProject(id, request);
         return Api.OK(result);
     }
 
-    @DeleteMapping("/{id}")
-    public Api<?> deleteProject(@PathVariable Long id) {
+    @DeleteMapping("{id}")
+    public Api<?> deleteProject(@PathVariable("id") Long id) {
         projectService.deleteProject(id);
         return Api.OK("삭제가 완료되었습니다.");
     }

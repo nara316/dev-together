@@ -6,7 +6,8 @@ import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.member.domain.Member;
 import com.project.devtogether.member.domain.MemberRepository;
 import com.project.devtogether.project.domain.Project;
-import com.project.devtogether.project.domain.ProjectRepository;
+import com.project.devtogether.project.dto.ProjectDto;
+import com.project.devtogether.project.repository.ProjectRepository;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
 import com.project.devtogether.project.dto.ProjectRegisterRequest;
 import com.project.devtogether.project.dto.ProjectResponse;
@@ -17,7 +18,6 @@ import com.project.devtogether.skill.domain.Skill;
 import com.project.devtogether.skill.domain.SkillRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,9 +49,10 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public ProjectResponse readProject(Long id) {
-        Project project = getProjectById(id);
-        return ProjectResponse.of(project);
+    public List<ProjectDto> readProject(Long id) {
+        //Project project = getProjectById(id);
+        return projectRepository.findProject(id);
+        //return ProjectResponse.of(project);
     }
 
     @Transactional(readOnly = true)
