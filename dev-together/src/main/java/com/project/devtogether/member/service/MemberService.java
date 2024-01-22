@@ -12,6 +12,7 @@ import com.project.devtogether.member.dto.MemberRegisterRequest;
 import com.project.devtogether.member.dto.MemberResponse;
 import com.project.devtogether.member.dto.MemberUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,10 @@ public class MemberService {
                 new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         TokenDto token = jwtTokenProvider.issueToken(authentication);
+
+        Member member = memberRepository.findFirstByEmail(email)
+                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+        member.setLastLoginAt(LocalDateTime.now());
         return token;
     }
 
@@ -69,6 +74,10 @@ public class MemberService {
 
     public MemberResponse updateMe(MemberUpdateRequest memberUpdateRequest) {
         Member member = getMemberBySecurity();
+        if (memberUpdateRequest.introduce() == null || memberUpdateRequest.introduce().isBlank()) {
+            member.setNickName(memberUpdateRequest.nickName());
+            return MemberResponse.of(member);
+        }
         member.setNickName(memberUpdateRequest.nickName());
         member.setIntroduce(memberUpdateRequest.introduce());
         return MemberResponse.of(member);

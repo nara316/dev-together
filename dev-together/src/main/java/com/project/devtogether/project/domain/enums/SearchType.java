@@ -1,4 +1,4 @@
-package com.project.devtogether.project.dto;
+package com.project.devtogether.project.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

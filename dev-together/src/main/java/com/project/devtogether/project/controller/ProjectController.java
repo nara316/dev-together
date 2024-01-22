@@ -5,15 +5,21 @@ import com.project.devtogether.project.dto.ProjectDto;
 import com.project.devtogether.project.dto.ProjectRegisterRequest;
 import com.project.devtogether.project.dto.ProjectResponse;
 import com.project.devtogether.project.dto.ProjectUpdateRequest;
+import com.project.devtogether.project.domain.enums.SearchType;
 import com.project.devtogether.project.service.ProjectService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -39,19 +45,15 @@ public class ProjectController {
     }
 
     @GetMapping
-    public Api<List<ProjectResponse>> readEnrollingProjects() {
-        List<ProjectResponse> result = projectService.readEnrollingProjects();
+    public Api<Page<ProjectDto>> readProjects(
+            @RequestParam(required = false, name = "searchType") SearchType searchType, //검색타입
+            @RequestParam(required = false, name = "searchValue") String searchValue, //검색어
+            Pageable pageable
+    ) {
+        System.out.println(searchValue+"왜 안되징");
+        Page<ProjectDto> result = projectService.readProjects(searchType, searchValue, pageable);
         return Api.OK(result);
     }
-
-//    @GetMapping()
-//    public Api<List<ProjectResponse>> readProjects(
-//            @RequestParam(required = false) SearchType searchType, //검색타입
-//            @RequestParam(required = false) String searchValue, //검색어
-//            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-//    ) {
-//        return Api.OK(result);
-//    }
 
     @PatchMapping("{id}")
     public Api<ProjectResponse> updateProject(@PathVariable("id") Long id, ProjectUpdateRequest request) {
@@ -60,7 +62,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("{id}")
-    public Api<?> deleteProject(@PathVariable("id") Long id) {
+    public Api<String> deleteProject(@PathVariable("id") Long id) {
         projectService.deleteProject(id);
         return Api.OK("삭제가 완료되었습니다.");
     }

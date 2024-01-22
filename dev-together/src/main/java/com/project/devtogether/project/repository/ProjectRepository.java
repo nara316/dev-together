@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>, ProjectCustomRepository {
 
-    public List<Project> findAllByStatus(ProjectStatus status);
+    List<Project> findAllByStatus(ProjectStatus status);
 }
