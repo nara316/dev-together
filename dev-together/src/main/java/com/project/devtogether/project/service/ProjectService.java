@@ -1,5 +1,6 @@
 package com.project.devtogether.project.service;
 
+import com.project.devtogether.common.api.Api;
 import com.project.devtogether.common.error.ErrorCode;
 import com.project.devtogether.common.exception.ApiException;
 import com.project.devtogether.common.security.util.SecurityUtil;
@@ -7,6 +8,7 @@ import com.project.devtogether.member.domain.Member;
 import com.project.devtogether.member.domain.MemberRepository;
 import com.project.devtogether.project.domain.Project;
 import com.project.devtogether.project.dto.ProjectDto;
+import com.project.devtogether.project.dto.SearchType;
 import com.project.devtogether.project.repository.ProjectRepository;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
 import com.project.devtogether.project.dto.ProjectRegisterRequest;
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,17 +54,18 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<ProjectDto> readProject(Long id) {
-        //Project project = getProjectById(id);
         return projectRepository.findProject(id);
-        //return ProjectResponse.of(project);
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectResponse> readEnrollingProjects() {
-        List<Project> projects = projectRepository.findAllByStatus(ProjectStatus.ENROLLING);
-        return projects.stream()
-                .map(ProjectResponse::of)
-                .collect(Collectors.toList());
+    public Page<ProjectDto> readProjects(SearchType searchType, String searchValue, Pageable pageable
+    ) {
+        if (searchValue == null || searchValue.isBlank()) {
+            return projectRepository.findProjects(pageable);
+        }
+
+
+        return null;
     }
 
     public ProjectResponse updateProject(Long id, ProjectUpdateRequest request) {
