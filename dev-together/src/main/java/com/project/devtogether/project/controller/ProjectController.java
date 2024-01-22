@@ -59,6 +59,13 @@ public class ProjectController {
         return Api.OK(result);
     }
 
+    @PatchMapping("{id}/{plusDate}")
+    public Api<ProjectResponse> updateProjectAdEndDate(
+            @PathVariable("id") Long id, @PathVariable("plusDate") Long plusDate) {
+        ProjectResponse result = projectService.updateProjectAdEndDate(id, plusDate);
+        return Api.OK(result);
+    }
+
     @DeleteMapping("{id}")
     public Api<String> deleteProject(@PathVariable("id") Long id) {
         projectService.deleteProject(id);

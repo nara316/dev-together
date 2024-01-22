@@ -47,6 +47,7 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
+    @Setter
     private LocalDateTime advertiseEndDate;
 
     @OneToMany(mappedBy = "project")

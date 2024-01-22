@@ -97,6 +97,16 @@ public class ProjectService {
         return ProjectResponse.of(project);
     }
 
+    public ProjectResponse updateProjectAdEndDate(Long id, Long plusDate) {
+        Member member = getReferenceBySecurity();
+        Project project = getProjectById(id);
+        checkQualifiedBySecurity(member.getId(), project.getMember().getId());
+
+        LocalDateTime previousEndDate = project.getAdvertiseEndDate();
+        project.setAdvertiseEndDate(previousEndDate.plusDays(plusDate));
+        return ProjectResponse.of(project);
+    }
+
     public void deleteProject(Long id) {
         Member member = getReferenceBySecurity();
         Project project = getProjectById(id);
