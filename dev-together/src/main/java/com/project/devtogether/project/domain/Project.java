@@ -50,6 +50,9 @@ public class Project {
     @OneToMany(mappedBy = "project")
     private List<ProjectSkill> skills = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project")
+    private List<ProjectMember> members = new ArrayList<>();
+
     @Column(nullable = false)
     private LocalDateTime registeredAt;
 
