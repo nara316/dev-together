@@ -53,7 +53,7 @@ public class MemberService {
                 new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         TokenDto token = jwtTokenProvider.issueToken(authentication);
-        
+
         Member member = memberRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
         member.setLastLoginAt(LocalDateTime.now());
@@ -74,6 +74,10 @@ public class MemberService {
 
     public MemberResponse updateMe(MemberUpdateRequest memberUpdateRequest) {
         Member member = getMemberBySecurity();
+        if (memberUpdateRequest.introduce() == null || memberUpdateRequest.introduce().isBlank()) {
+            member.setNickName(memberUpdateRequest.nickName());
+            return MemberResponse.of(member);
+        }
         member.setNickName(memberUpdateRequest.nickName());
         member.setIntroduce(memberUpdateRequest.introduce());
         return MemberResponse.of(member);
