@@ -48,7 +48,7 @@ public class ProjectController {
     public Api<Page<ProjectDto>> readProjects(
             @RequestParam(required = false, name = "searchType") SearchType searchType, //검색타입
             @RequestParam(required = false, name = "searchValue") String searchValue, //검색어
-            @PageableDefault(size = 10, sort = "registeredBy", direction = Sort.Direction.DESC) Pageable pageable
+            Pageable pageable
     ) {
         System.out.println(searchValue+"왜 안되징");
         Page<ProjectDto> result = projectService.readProjects(searchType, searchValue, pageable);
