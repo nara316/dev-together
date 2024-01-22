@@ -5,12 +5,14 @@ import com.project.devtogether.project.dto.ProjectDto;
 import com.project.devtogether.project.dto.ProjectRegisterRequest;
 import com.project.devtogether.project.dto.ProjectResponse;
 import com.project.devtogether.project.dto.ProjectUpdateRequest;
-import com.project.devtogether.project.dto.SearchType;
+import com.project.devtogether.project.domain.enums.SearchType;
 import com.project.devtogether.project.service.ProjectService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,10 +46,11 @@ public class ProjectController {
 
     @GetMapping
     public Api<Page<ProjectDto>> readProjects(
-            @RequestParam(required = false) SearchType searchType, //검색타입
-            @RequestParam(required = false) String searchValue, //검색어
-            Pageable pageable
+            @RequestParam(required = false, name = "searchType") SearchType searchType, //검색타입
+            @RequestParam(required = false, name = "searchValue") String searchValue, //검색어
+            @PageableDefault(size = 10, sort = "registeredBy", direction = Sort.Direction.DESC) Pageable pageable
     ) {
+        System.out.println(searchValue+"왜 안되징");
         Page<ProjectDto> result = projectService.readProjects(searchType, searchValue, pageable);
         return Api.OK(result);
     }
