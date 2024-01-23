@@ -38,7 +38,7 @@ public class ProjectService {
 
     public ProjectResponse register(ProjectRegisterRequest request) {
         Member member = getReferenceBySecurity();
-        LocalDateTime endDate = calculateAdvertiseEndDate(request.advertisementEndDate());
+        LocalDateTime endDate = calculateAdvertiseEndDate(request.advertiseEndDate());
         Project project = Project.of(member, request.title(), request.content(), endDate);
         projectRepository.save(project);
 
@@ -132,13 +132,13 @@ public class ProjectService {
         }
     }
 
-    private LocalDateTime calculateAdvertiseEndDate(LocalDateTime advertisementEndDate) {
-        if (advertisementEndDate.isBefore(LocalDateTime.now())) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "현재 날짜보다 과거를 입력할 수 없습니다.");
-        }
-        if (advertisementEndDate == null) {
+    private LocalDateTime calculateAdvertiseEndDate(LocalDateTime advertiseEndDate) {
+        if (advertiseEndDate == null) {
             return LocalDateTime.now().plusDays(7);
         }
-        return advertisementEndDate;
+        if (advertiseEndDate.isBefore(LocalDateTime.now())) {
+            throw new ApiException(ErrorCode.BAD_REQUEST, "현재 날짜보다 과거를 입력할 수 없습니다.");
+        }
+        return advertiseEndDate;
     }
 }

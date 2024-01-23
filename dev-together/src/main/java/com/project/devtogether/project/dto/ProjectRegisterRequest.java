@@ -1,5 +1,7 @@
 package com.project.devtogether.project.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +12,8 @@ public record ProjectRegisterRequest(
         @NotBlank String content,
         @NotBlank List<String> skills,
 
-        @DateTimeFormat(pattern = "yyyy-MM-dd")
-        LocalDateTime advertisementEndDate
+        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime advertiseEndDate
 ) {
 }
