@@ -1,5 +1,6 @@
 package com.project.devtogether.common.security.service;
 
+import com.project.devtogether.common.error.MemberErrorCode;
 import com.project.devtogether.common.exception.ApiException;
 import com.project.devtogether.common.security.user.CustomUserDetail;
 import com.project.devtogether.member.domain.Member;
@@ -24,6 +25,7 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findFirstByEmail(username)
                 .map(this::createUserDetails)
+                .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     private CustomUserDetail createUserDetails(Member member) {
