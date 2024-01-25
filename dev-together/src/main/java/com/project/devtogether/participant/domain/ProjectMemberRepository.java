@@ -1,6 +1,5 @@
-package com.project.devtogether.project.repository;
+package com.project.devtogether.participant.domain;
 
-import com.project.devtogether.project.domain.ProjectMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {

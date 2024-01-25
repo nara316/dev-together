@@ -1,6 +1,7 @@
 package com.project.devtogether.project.domain;
 
 import com.project.devtogether.member.domain.Member;
+import com.project.devtogether.participant.domain.ProjectMember;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
 import com.project.devtogether.skill.domain.ProjectSkill;
 import jakarta.persistence.Column;

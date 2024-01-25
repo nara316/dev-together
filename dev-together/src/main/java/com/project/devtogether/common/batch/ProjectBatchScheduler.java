@@ -1,4 +1,4 @@
-package com.project.devtogether.batch;
+package com.project.devtogether.common.batch;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

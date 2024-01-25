@@ -3,7 +3,6 @@ package com.project.devtogether.member.domain;
 import com.project.devtogether.member.domain.enums.MemberRole;
 import com.project.devtogether.member.domain.enums.MemberStatus;
 import com.project.devtogether.project.domain.Project;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

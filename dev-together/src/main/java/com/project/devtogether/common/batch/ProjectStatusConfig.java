@@ -1,4 +1,4 @@
-package com.project.devtogether.batch;
+package com.project.devtogether.common.batch;
 
 import com.project.devtogether.project.domain.Project;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
@@ -8,9 +8,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
