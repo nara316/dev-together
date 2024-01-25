@@ -2,8 +2,8 @@ package com.project.devtogether.member.domain;
 
 import com.project.devtogether.member.domain.enums.MemberRole;
 import com.project.devtogether.member.domain.enums.MemberStatus;
+import com.project.devtogether.participant.domain.ProjectMember;
 import com.project.devtogether.project.domain.Project;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -64,6 +64,9 @@ public class Member{
 
     @OneToMany(mappedBy = "member")
     private List<Project> projects = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<ProjectMember> projectMembers = new ArrayList<>();
 
     protected Member() {}
 

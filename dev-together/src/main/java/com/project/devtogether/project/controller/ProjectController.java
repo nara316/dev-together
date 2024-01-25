@@ -11,13 +11,12 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,6 +57,13 @@ public class ProjectController {
     @PatchMapping("{id}")
     public Api<ProjectResponse> updateProject(@PathVariable("id") Long id, ProjectUpdateRequest request) {
         ProjectResponse result = projectService.updateProject(id, request);
+        return Api.OK(result);
+    }
+
+    @PatchMapping("{id}/{plusDate}")
+    public Api<ProjectResponse> updateProjectAdEndDate(
+            @PathVariable("id") Long id, @PathVariable("plusDate") Long plusDate) {
+        ProjectResponse result = projectService.updateProjectAdEndDate(id, plusDate);
         return Api.OK(result);
     }
 

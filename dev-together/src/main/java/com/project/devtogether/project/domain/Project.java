@@ -1,6 +1,7 @@
 package com.project.devtogether.project.domain;
 
 import com.project.devtogether.member.domain.Member;
+import com.project.devtogether.participant.domain.ProjectMember;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
 import com.project.devtogether.skill.domain.ProjectSkill;
 import jakarta.persistence.Column;
@@ -47,8 +48,14 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
+    @Setter
+    private LocalDateTime advertiseEndDate;
+
     @OneToMany(mappedBy = "project")
     private List<ProjectSkill> skills = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project")
+    private List<ProjectMember> members = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime registeredAt;
@@ -65,19 +72,20 @@ public class Project {
 
     protected Project() {}
 
-    private Project(Member member, String title, String content) {
+    private Project(Member member, String title, String content, LocalDateTime advertisementEndDate) {
         setMember(member);
         this.title = title;
         this.content = content;
         this.status = ProjectStatus.ENROLLING;
+        this.advertiseEndDate = advertisementEndDate;
         this.registeredAt = LocalDateTime.now();
         this.registeredBy = member.getNickName();
         this.modifiedAt = LocalDateTime.now();
         this.modifiedBy = member.getNickName();
     }
 
-    public static Project of(Member member, String title, String content) {
-        return new Project(member, title, content);
+    public static Project of(Member member, String title, String content, LocalDateTime advertisementEndDate) {
+        return new Project(member, title, content, advertisementEndDate);
     }
 
     /*

@@ -38,7 +38,8 @@ public class ProjectService {
 
     public ProjectResponse register(ProjectRegisterRequest request) {
         Member member = getReferenceBySecurity();
-        Project project = Project.of(member, request.title(), request.content());
+        LocalDateTime endDate = calculateAdvertiseEndDate(request.advertiseEndDate());
+        Project project = Project.of(member, request.title(), request.content(), endDate);
         projectRepository.save(project);
 
         List<String> skills = request.skills();
@@ -96,6 +97,16 @@ public class ProjectService {
         return ProjectResponse.of(project);
     }
 
+    public ProjectResponse updateProjectAdEndDate(Long id, Long plusDate) {
+        Member member = getReferenceBySecurity();
+        Project project = getProjectById(id);
+        checkQualifiedBySecurity(member.getId(), project.getMember().getId());
+
+        LocalDateTime previousEndDate = project.getAdvertiseEndDate();
+        project.setAdvertiseEndDate(previousEndDate.plusDays(plusDate));
+        return ProjectResponse.of(project);
+    }
+
     public void deleteProject(Long id) {
         Member member = getReferenceBySecurity();
         Project project = getProjectById(id);
@@ -119,5 +130,15 @@ public class ProjectService {
         if (securityId != projectId) {
             throw new ApiException(ErrorCode.BAD_REQUEST, "해당 권한이 없습니다.");
         }
+    }
+
+    private LocalDateTime calculateAdvertiseEndDate(LocalDateTime advertiseEndDate) {
+        if (advertiseEndDate == null) {
+            return LocalDateTime.now().plusDays(7);
+        }
+        if (advertiseEndDate.isBefore(LocalDateTime.now())) {
+            throw new ApiException(ErrorCode.BAD_REQUEST, "현재 날짜보다 과거를 입력할 수 없습니다.");
+        }
+        return advertiseEndDate;
     }
 }
