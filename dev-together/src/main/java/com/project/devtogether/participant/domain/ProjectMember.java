@@ -41,6 +41,7 @@ public class ProjectMember {
     @Enumerated(EnumType.STRING)
     private ParticipantStatus status;
 
+    @Setter
     @Column(length = 500)
     private String comment;
 
