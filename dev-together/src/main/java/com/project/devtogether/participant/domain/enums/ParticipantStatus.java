@@ -5,5 +5,4 @@ public enum ParticipantStatus {
     CANCELED, //취소
     ACCEPTED, //승인
     REJECTED, //거부
-    EXPELLED //강퇴
 }
