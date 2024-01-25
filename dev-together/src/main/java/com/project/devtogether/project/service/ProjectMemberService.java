@@ -12,6 +12,7 @@ import com.project.devtogether.participant.domain.enums.ParticipantUpdateStatus;
 import com.project.devtogether.participant.dto.ProjectMemberResponse;
 import com.project.devtogether.participant.dto.ProjectMemberUpdateRequest;
 import com.project.devtogether.project.domain.Project;
+import com.project.devtogether.project.domain.enums.ProjectStatus;
 import com.project.devtogether.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,9 @@ public class ProjectMemberService {
     public ProjectMemberResponse apply(Long id) {
         Member member = getReferenceBySecurity();
         Project project = getProjectById(id);
+        if (project.getStatus() != ProjectStatus.ENROLLING) {
+            throw new ApiException(ErrorCode.BAD_REQUEST, "모집종료된 게시글입니다.");
+        }
 
         ProjectMember projectMember = ProjectMember.of(project, member);
         projectMemberRepository.save(projectMember);
@@ -55,6 +59,10 @@ public class ProjectMemberService {
         Member member = getReferenceBySecurity();
         ProjectMember projectMember = getProjectMemberById(id);
         checkQualifiedBySecurity(member.getId(), projectMember.getProject().getMember().getId());
+
+        if (projectMember.getStatus() != ParticipantStatus.APPLIED) {
+            throw new ApiException(ErrorCode.BAD_REQUEST, "이미 취소된 신청입니다.");
+        }
 
         projectMember.setComment(projectMemberUpdateRequest.comment());
         switch (participantUpdateStatus) {
