@@ -1,6 +1,6 @@
 package com.project.devtogether.project.service;
 
-import com.project.devtogether.common.error.ErrorCode;
+import com.project.devtogether.common.error.ProjectErrorCode;
 import com.project.devtogether.common.exception.ApiException;
 import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.member.domain.Member;
@@ -31,9 +31,7 @@ public class ProjectMemberService {
     public ProjectMemberResponse apply(Long id) {
         Member member = getReferenceBySecurity();
         Project project = getProjectById(id);
-        if (project.getStatus() != ProjectStatus.ENROLLING) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "모집종료된 게시글입니다.");
-        }
+        ProjectStatus.checkStatusIsEnrolling(project.getStatus());
 
         ProjectMember projectMember = ProjectMember.of(project, member);
         projectMemberRepository.save(projectMember);
@@ -44,11 +42,9 @@ public class ProjectMemberService {
         Member member = getReferenceBySecurity();
         ProjectMember projectMember = getProjectMemberById(id);
         checkQualifiedBySecurity(member.getId(), projectMember.getMember().getId());
+        //TODO:: 신청 단계가 아닌 다른 단계에서도 취소할 수 있게 해야함 (자발적 나가기)
+        ParticipantStatus.checkStatusIsApplied(projectMember.getStatus());
 
-        //TODO:: 신청 단계가 아닌 다른 단계에서도 취소할 수 있게 해야함 (하지만 기준이 필요)
-        if (projectMember.getStatus() != ParticipantStatus.APPLIED) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "신청 단계가 아닌 경우 취소할 수 없습니다.");
-        }
         projectMember.setStatus(ParticipantStatus.CANCELED);
         return ProjectMemberResponse.of(projectMember);
     }
@@ -59,10 +55,8 @@ public class ProjectMemberService {
         Member member = getReferenceBySecurity();
         ProjectMember projectMember = getProjectMemberById(id);
         checkQualifiedBySecurity(member.getId(), projectMember.getProject().getMember().getId());
-
-        if (projectMember.getStatus() != ParticipantStatus.APPLIED) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "이미 취소된 신청입니다.");
-        }
+        //TODO:: 신청 단계가 아닌 다른 단계에서도 취소할 수 있게 해야함 (강퇴)
+        ParticipantStatus.checkStatusIsApplied(projectMember.getStatus());
 
         projectMember.setComment(projectMemberUpdateRequest.comment());
         switch (participantUpdateStatus) {
@@ -78,18 +72,18 @@ public class ProjectMemberService {
 
     private Project getProjectById(Long id) {
         return projectRepository.findById(id)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(ProjectErrorCode.PROJECT_NOT_FOUND));
     }
 
     private void checkQualifiedBySecurity(Long securityId, Long projectMemberId) {
         if (securityId != projectMemberId) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "해당 권한이 없습니다.");
+            throw new ApiException(ProjectErrorCode.PROJECT_MEMBER_NOT_QUALIFIED);
         }
     }
 
     private ProjectMember getProjectMemberById(Long id) {
         ProjectMember projectMember = projectMemberRepository.findById(id)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 신청이 존재하지 않습니다."));
+                .orElseThrow(() -> new ApiException(ProjectErrorCode.PROJECT_MEMBER_NOT_FOUND));
         return projectMember;
     }
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /*
-* member의 경우 1000번대 에러코드 사용
+* member 관련 1000번대 에러코드 사용
 * */
 @AllArgsConstructor
 @Getter
