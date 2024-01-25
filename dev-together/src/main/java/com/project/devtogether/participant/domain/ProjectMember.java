@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
@@ -35,9 +36,10 @@ public class ProjectMember {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Setter
     @Column(length = 25, nullable = false)
     @Enumerated(EnumType.STRING)
-    private ParticipantStatus participantStatus;
+    private ParticipantStatus status;
 
     @Column(length = 500)
     private String comment;
@@ -46,8 +48,8 @@ public class ProjectMember {
 
     private ProjectMember(Project project, Member member) {
         setProject(project);
-        this.member = member;
-        this.participantStatus = ParticipantStatus.APPLIED;
+        setMember(member);
+        this.status = ParticipantStatus.APPLIED;
     }
 
     public static ProjectMember of(Project project, Member member) {
@@ -60,6 +62,11 @@ public class ProjectMember {
     public void setProject(Project project) {
         this.project = project;
         project.getMembers().add(this);
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+        member.getProjectMembers().add(this);
     }
 }
 
