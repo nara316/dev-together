@@ -5,6 +5,8 @@ import com.project.devtogether.common.exception.ApiException;
 import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.member.domain.Member;
 import com.project.devtogether.member.domain.MemberRepository;
+import com.project.devtogether.participant.domain.ProjectMember;
+import com.project.devtogether.participant.domain.ProjectMemberRepository;
 import com.project.devtogether.project.domain.Project;
 import com.project.devtogether.project.dto.ProjectDto;
 import com.project.devtogether.project.domain.enums.SearchType;
@@ -35,12 +37,14 @@ public class ProjectService {
     private final MemberRepository memberRepository;
     private final SkillRepository skillRepository;
     private final ProjectSkillRepository projectSkillRepository;
+    private final ProjectMemberRepository projectMemberRepository;
 
     public ProjectResponse register(ProjectRegisterRequest request) {
         Member member = getReferenceBySecurity();
         LocalDateTime endDate = calculateAdvertiseEndDate(request.advertiseEndDate());
-        Project project = Project.of(member, request.title(), request.content(), endDate);
+        Project project = Project.of(member, request.title(), request.content(), request.recruitCapacity(), endDate);
         projectRepository.save(project);
+        project.addCurrentCapacity();
 
         List<String> skills = request.skills();
         for (String skill : skills) {
@@ -49,6 +53,9 @@ public class ProjectService {
             ProjectSkill projectSkill = ProjectSkill.of(project, findSkill);
             projectSkillRepository.save(projectSkill);
         }
+
+        ProjectMember projectMember = ProjectMember.of(project, member);
+        projectMemberRepository.save(projectMember);
         return ProjectResponse.of(project);
     }
 
@@ -112,9 +119,11 @@ public class ProjectService {
         Project project = getProjectById(id);
         checkQualifiedBySecurity(member.getId(), project.getMember().getId());
 
-        //ProjectSkill도 삭제
+        //ProjectSkill, ProjectMember도 삭제
         projectSkillRepository.deleteAllByProjectId(project.getId());
+        projectMemberRepository.deleteAllByProjectId(project.getId());
         projectRepository.deleteById(project.getId());
+
     }
 
     private Member getReferenceBySecurity() {

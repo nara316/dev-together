@@ -54,13 +54,17 @@ public class ProjectMemberService {
 
         Member member = getReferenceBySecurity();
         ProjectMember projectMember = getProjectMemberById(id);
-        checkQualifiedBySecurity(member.getId(), projectMember.getProject().getMember().getId());
+        Project project = projectMember.getProject();
+        checkQualifiedBySecurity(member.getId(), project.getMember().getId());
         //TODO:: 신청 단계가 아닌 다른 단계에서도 취소할 수 있게 해야함 (강퇴)
         ParticipantStatus.checkStatusIsApplied(projectMember.getStatus());
 
         projectMember.setComment(projectMemberUpdateRequest.comment());
         switch (participantUpdateStatus) {
-            case ACCEPTED -> projectMember.setStatus(ParticipantStatus.ACCEPTED);
+            case ACCEPTED -> {
+                projectMember.setStatus(ParticipantStatus.ACCEPTED);
+                project.addCurrentCapacity();
+            }
             case REJECTED -> projectMember.setStatus(ParticipantStatus.REJECTED);
         };
         return ProjectMemberResponse.of(projectMember);

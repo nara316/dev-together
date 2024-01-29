@@ -48,6 +48,12 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
+    @Column(nullable = false)
+    private Integer recruitCapacity;
+
+    @Setter
+    private Integer currentCapacity;
+
     @Setter
     private LocalDateTime advertiseEndDate;
 
@@ -72,11 +78,12 @@ public class Project {
 
     protected Project() {}
 
-    private Project(Member member, String title, String content, LocalDateTime advertisementEndDate) {
+    private Project(Member member, String title, String content, Integer recruitCapacity, LocalDateTime advertisementEndDate) {
         setMember(member);
         this.title = title;
         this.content = content;
         this.status = ProjectStatus.ENROLLING;
+        this.recruitCapacity = recruitCapacity;
         this.advertiseEndDate = advertisementEndDate;
         this.registeredAt = LocalDateTime.now();
         this.registeredBy = member.getNickName();
@@ -84,8 +91,22 @@ public class Project {
         this.modifiedBy = member.getNickName();
     }
 
-    public static Project of(Member member, String title, String content, LocalDateTime advertisementEndDate) {
-        return new Project(member, title, content, advertisementEndDate);
+    public static Project of(Member member, String title, String content, Integer recruitCapacity, LocalDateTime advertisementEndDate) {
+        return new Project(member, title, content, recruitCapacity, advertisementEndDate);
+    }
+
+    public void addCurrentCapacity() {
+        this.currentCapacity++;
+        if (currentCapacity == recruitCapacity) {
+            status = ProjectStatus.CLOSED;
+        }
+    }
+
+    public void subtractCurrentCapacity() {
+        this.currentCapacity--;
+        if (currentCapacity < recruitCapacity) {
+            status = ProjectStatus.ENROLLING;
+        }
     }
 
     /*
