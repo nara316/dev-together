@@ -1,6 +1,6 @@
 package com.project.devtogether.member.service;
 
-import com.project.devtogether.common.error.ErrorCode;
+import com.project.devtogether.common.error.MemberErrorCode;
 import com.project.devtogether.common.exception.ApiException;
 import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.common.token.dto.TokenDto;
@@ -11,10 +11,7 @@ import com.project.devtogether.member.dto.MemberLoginRequest;
 import com.project.devtogether.member.dto.MemberRegisterRequest;
 import com.project.devtogether.member.dto.MemberResponse;
 import com.project.devtogether.member.dto.MemberUpdateRequest;
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,7 +34,7 @@ public class MemberService {
 
     public MemberResponse register(MemberRegisterRequest memberRegisterRequest) {
         if (isDuplicatedEmail(memberRegisterRequest.email())) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "이메일은 중복될 수 없습니다.");
+            throw new ApiException(MemberErrorCode.EMAIL_NOT_DUPLICATED);
         }
 
         Member member = memberRegisterRequest.toEntity();
@@ -55,14 +52,15 @@ public class MemberService {
         TokenDto token = jwtTokenProvider.issueToken(authentication);
 
         Member member = memberRepository.findFirstByEmail(email)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+                .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         member.setLastLoginAt(LocalDateTime.now());
         return token;
     }
 
     @Transactional(readOnly = true)
     public MemberResponse readMember(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         return MemberResponse.of(member);
     }
 
@@ -90,7 +88,7 @@ public class MemberService {
     private Member getMemberBySecurity() {
         String currentUserEmail = SecurityUtil.getCurrentUserEmail();
         Member member = memberRepository.findFirstByEmail(currentUserEmail)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
+                .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         return member;
     }
 }

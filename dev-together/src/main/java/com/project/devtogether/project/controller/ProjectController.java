@@ -7,6 +7,7 @@ import com.project.devtogether.project.dto.ProjectResponse;
 import com.project.devtogether.project.dto.ProjectUpdateRequest;
 import com.project.devtogether.project.domain.enums.SearchType;
 import com.project.devtogether.project.service.ProjectService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping("/register")
-    public Api<ProjectResponse> register(ProjectRegisterRequest request) {
+    public Api<ProjectResponse> register(@Valid @RequestBody ProjectRegisterRequest request) {
         ProjectResponse result = projectService.register(request);
         return Api.OK(result);
     }
@@ -49,13 +50,13 @@ public class ProjectController {
             @RequestParam(required = false, name = "searchValue") String searchValue, //검색어
             Pageable pageable
     ) {
-        System.out.println(searchValue+"왜 안되징");
         Page<ProjectDto> result = projectService.readProjects(searchType, searchValue, pageable);
         return Api.OK(result);
     }
 
     @PatchMapping("{id}")
-    public Api<ProjectResponse> updateProject(@PathVariable("id") Long id, ProjectUpdateRequest request) {
+    public Api<ProjectResponse> updateProject(@PathVariable("id") Long id,
+                                              @Valid @RequestBody ProjectUpdateRequest request) {
         ProjectResponse result = projectService.updateProject(id, request);
         return Api.OK(result);
     }

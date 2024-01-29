@@ -1,6 +1,7 @@
 package com.project.devtogether.common.token.privider;
 
 import com.project.devtogether.common.error.ErrorCode;
+import com.project.devtogether.common.error.MemberErrorCode;
 import com.project.devtogether.common.exception.ApiException;
 import com.project.devtogether.common.security.user.CustomUserDetail;
 import com.project.devtogether.common.token.dto.TokenDto;
@@ -75,9 +76,9 @@ public class JwtTokenProvider {
         } catch (Exception e) {
 
             if (e instanceof SignatureException) {
-                throw new ApiException(ErrorCode.SERVER_ERROR, "토큰이 유효하지 않습니다.");
+                throw new ApiException(MemberErrorCode.TOKEN_NOT_EXIST);
             } else if (e instanceof ExpiredJwtException) {
-                throw new ApiException(ErrorCode.SERVER_ERROR, "토큰이 만료되었습니다.");
+                throw new ApiException(MemberErrorCode.TOKEN_IS_EXPIRED);
             } else {
                 throw new ApiException(ErrorCode.SERVER_ERROR);
             }
@@ -106,7 +107,7 @@ public class JwtTokenProvider {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
-            throw new ApiException(ErrorCode.SERVER_ERROR, "토큰이 만료되었습니다.");
+            throw new ApiException(MemberErrorCode.TOKEN_IS_EXPIRED);
         }
     }
 

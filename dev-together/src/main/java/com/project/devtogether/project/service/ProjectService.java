@@ -1,6 +1,6 @@
 package com.project.devtogether.project.service;
 
-import com.project.devtogether.common.error.ErrorCode;
+import com.project.devtogether.common.error.ProjectErrorCode;
 import com.project.devtogether.common.exception.ApiException;
 import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.member.domain.Member;
@@ -45,7 +45,7 @@ public class ProjectService {
         List<String> skills = request.skills();
         for (String skill : skills) {
             Skill findSkill = skillRepository.findById(Long.parseLong(skill))
-                    .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 스킬을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new ApiException(ProjectErrorCode.SKILL_NOT_FOUND));
             ProjectSkill projectSkill = ProjectSkill.of(project, findSkill);
             projectSkillRepository.save(projectSkill);
         }
@@ -89,7 +89,7 @@ public class ProjectService {
         List<String> updateSkills = request.skills();
         for (String skill : updateSkills) {
             Skill findSkill = skillRepository.findById(Long.parseLong(skill))
-                    .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 스킬을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new ApiException(ProjectErrorCode.SKILL_NOT_FOUND));
             ProjectSkill projectSkill = ProjectSkill.of(project, findSkill);
             projectSkillRepository.save(projectSkill);
         }
@@ -123,12 +123,12 @@ public class ProjectService {
 
     private Project getProjectById(Long id) {
         return projectRepository.findById(id)
-                .orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST, "해당 게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(ProjectErrorCode.PROJECT_NOT_FOUND));
     }
 
     private void checkQualifiedBySecurity(Long securityId, Long projectId) {
         if (securityId != projectId) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "해당 권한이 없습니다.");
+            throw new ApiException(ProjectErrorCode.PROJECT_NOT_QUALIFIED);
         }
     }
 
@@ -137,7 +137,7 @@ public class ProjectService {
             return LocalDateTime.now().plusDays(7);
         }
         if (advertiseEndDate.isBefore(LocalDateTime.now())) {
-            throw new ApiException(ErrorCode.BAD_REQUEST, "현재 날짜보다 과거를 입력할 수 없습니다.");
+            throw new ApiException(ProjectErrorCode.PROJECT_END_DATE_CANNOT_BEFORE_REGISTER_AT);
         }
         return advertiseEndDate;
     }

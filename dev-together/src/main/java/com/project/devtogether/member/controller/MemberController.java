@@ -1,14 +1,12 @@
 package com.project.devtogether.member.controller;
 
 import com.project.devtogether.common.api.Api;
-import com.project.devtogether.common.error.ErrorCode;
 import com.project.devtogether.common.token.dto.TokenDto;
 import com.project.devtogether.member.dto.MemberLoginRequest;
 import com.project.devtogether.member.dto.MemberRegisterRequest;
 import com.project.devtogether.member.dto.MemberResponse;
 import com.project.devtogether.member.dto.MemberUpdateRequest;
 import com.project.devtogether.member.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +26,7 @@ public class MemberController {
 
     @PostMapping("/register")
     public Api<MemberResponse> register(
-            @Valid
-            @RequestBody MemberRegisterRequest request
+            @Valid @RequestBody MemberRegisterRequest request
     ) {
         MemberResponse response = memberService.register(request);
         return Api.OK(response);
@@ -37,8 +34,7 @@ public class MemberController {
 
     @PostMapping("/login")
     public Api<TokenDto> login(
-            @Valid
-            @RequestBody MemberLoginRequest request
+            @Valid @RequestBody MemberLoginRequest request
     ) {
         TokenDto token = memberService.login(request);
         return Api.OK(token);
@@ -57,7 +53,7 @@ public class MemberController {
     }
 
     @PatchMapping("/me")
-    public Api<MemberResponse> updateMe(MemberUpdateRequest request) {
+    public Api<MemberResponse> updateMe(@Valid @RequestBody MemberUpdateRequest request) {
         MemberResponse result = memberService.updateMe(request);
         return Api.OK(result);
     }
