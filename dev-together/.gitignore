@@ -55,6 +55,10 @@ cmake-build-*/
 
 # IntelliJ
 out/
+*.yaml
+*.yml
+application.yaml
+**/generated
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -221,10 +225,3 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij+all,windows,macos,visualstudiocode,gradle
-
-.DS_Store
-
-*.yaml
-*.yml
-application.yaml
-**/generated
