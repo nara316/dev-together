@@ -5,8 +5,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest 
-    env : 
-      working-directory: ./dev-together
+    env :
       PROJECT_NAME: dev-together
       BUCKET_NAME: dev-together-bucket
       CODE_DEPLOY_APP_NAME: dev-together
@@ -18,12 +17,10 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-        working-directory: ${{ env.working-directory }}
-        
+        run: chmod +x ./gradlew
+      
       - name: Build with Gradle
         run: ./gradlew build -x test
-        working-directory: ${{ env.working-directory }}
 
       - name: Make Zip File
         run: zip -qq -r ./$GITHUB_SHA.zip .
