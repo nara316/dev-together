@@ -10,12 +10,25 @@ jobs:
       BUCKET_NAME: dev-together-bucket
       CODE_DEPLOY_APP_NAME: dev-together
       DEPLOYMENT_GROUP_NAME: dev-together-deploy-group
+      RESOURCE_PATH: .src/main/resources/application.yml
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
+
+      - name: Set yml file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.RESOURCE_PATH }}
+        env:
+          spring.datasource.url: ${{ secrets.DATASOURCE_URL }}
+          spring.datasource.username: ${{ secrets.DATASOURCE_USERNAME }}
+          spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }}
+          jwt.key: ${{ secrets.TOKEN_SECRET_KEY }}
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
