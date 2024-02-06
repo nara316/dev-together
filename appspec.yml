@@ -2,17 +2,17 @@ version: 0.0
 os: linux
 
 files:
-  - source: /home/ubuntu/dev-together
+  - source: /
     destination: /home/ubuntu/dev-together
     overwrite: yes
 permissions:
-  - object: /home/ubuntu/dev-together
+  - object: /
     pattern: "**"
     owner: ubuntu
     group: ubuntu
 
 hooks:
   ApplicationStart:
-    - location: /home/ubuntu/dev-together/scripts/deploy.sh
+    - location: scripts/deploy.sh
       timeout: 60
       runas: ubuntu
