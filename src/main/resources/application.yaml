@@ -11,10 +11,10 @@ spring:
       ddl-auto: validate
     defer-datasource-initialization: true
   datasource:
-    url: ${DATASOURCE_URL}
+    url: ${SPRING_DATASOURCE_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
 token:
   secret:

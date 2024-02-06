@@ -10,7 +10,7 @@ jobs:
       BUCKET_NAME: dev-together-bucket
       CODE_DEPLOY_APP_NAME: dev-together
       DEPLOYMENT_GROUP_NAME: dev-together-deploy-group
-      RESOURCE_PATH: .src/main/resources/application.yaml
+      RESOURCE_PATH: ./src/main/resources/application.yaml
 
     steps:
       - uses: actions/checkout@v3
