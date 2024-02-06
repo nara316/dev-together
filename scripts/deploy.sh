@@ -9,7 +9,7 @@
          sleep 3
  fi
 
- JAR_PATH="/home/ubuntu/dev-together/*.jar"
+ JAR_PATH="/home/ubuntu/dev-together/build/libs/*.jar"
  echo "jar path : $JAR_PATH"
  chmod +x $JAR_PATH
  nohup java -jar $JAR_PATH >> /home/ubuntu/dev-together/deploy.log 2>> /home/ubuntu/dev-together/deploy_err.log &
