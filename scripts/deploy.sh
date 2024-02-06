@@ -9,8 +9,8 @@
          sleep 3
  fi
 
- JAR_PATH="/home/ubuntu/dev-together/build/libs/dev-together-0.0.1-SNAPSHOT.jar"
+ JAR_PATH=$(find /home/ubuntu/dev-together/build/libs/ -name 'dev-together-0.0.1-SNAPSHOT.jar' | head -n 1)
  echo "jar path : $JAR_PATH"
  chmod +x $JAR_PATH
  nohup java -jar $JAR_PATH >> /home/ubuntu/dev-together/deploy.log 2>> /home/ubuntu/dev-together/deploy_err.log &
- echo "jar fild deploy success"
+ echo "jar faild deploy success"
