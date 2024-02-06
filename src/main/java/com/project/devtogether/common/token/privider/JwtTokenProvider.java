@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${token.secret.key}")
+    @Value("${{ secrets.TOKEN_SECRET_KEY }}")
     private String secretKey;
 
     @Value("${token.access-token.plus-hour}")
