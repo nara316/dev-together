@@ -1,6 +1,6 @@
 #!/bin/bash
 
-JAR_FILE="$PROJECT_ROOT/home/ubuntu/dev-together/build/libs/dev-together-0.0.1-SNAPSHOT.jar"
+JAR_FILE="/home/ubuntu/dev-together/build/libs/dev-together-0.0.1-SNAPSHOT.jar"
 
 # service_url.inc 에서 현재 서비스를 하고 있는 WAS의 포트 번호 가져오기
 CURRENT_PORT=$(cat /home/ubuntu/service_url.inc | grep -Po '[0-9]+' | tail -1)
