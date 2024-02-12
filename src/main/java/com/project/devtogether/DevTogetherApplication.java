@@ -13,5 +13,4 @@ public class DevTogetherApplication {
     public static void main(String[] args) {
         SpringApplication.run(DevTogetherApplication.class, args);
     }
-
 }
