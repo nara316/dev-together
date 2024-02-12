@@ -26,10 +26,3 @@ echo "> Now Nginx proxies to ${TARGET_PORT}."
 sudo service nginx reload
 
 echo "> Nginx reloaded."
-
-# -9 SIGKILL 은 서버를 바로 종료하므로
-# -15 SIGTERM  안전 종료인 SIGTERM을 사용하여 이전 포트 프로세스를 제거한다.
-
-CURRENT_PID=$(lsof -Fp -i TCP:${CURRENT_PORT} | grep -Po 'p[0-9]+' | grep -Po '[0-9]+')
-
-sudo kill -15 ${CURRENT_PID}
