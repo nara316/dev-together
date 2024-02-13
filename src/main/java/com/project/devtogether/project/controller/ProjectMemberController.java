@@ -5,6 +5,7 @@ import com.project.devtogether.participant.domain.enums.ParticipantUpdateStatus;
 import com.project.devtogether.participant.dto.ProjectMemberResponse;
 import com.project.devtogether.participant.dto.ProjectMemberUpdateRequest;
 import com.project.devtogether.project.service.ProjectMemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,18 +23,21 @@ public class ProjectMemberController {
 
     private final ProjectMemberService projectMemberService;
 
+    @Operation(summary = "게시글 참여 신청 API")
     @GetMapping("{projectId}")
     public Api<ProjectMemberResponse> apply(@PathVariable("projectId") Long projectId) {
         ProjectMemberResponse result = projectMemberService.apply(projectId);
         return Api.OK(result);
     }
 
+    @Operation(summary = "게시글 참여 취소 API")
     @PatchMapping("{projectMemberId}")
     public Api<ProjectMemberResponse> cancel(@PathVariable("projectMemberId") Long projectMemberId) {
         ProjectMemberResponse result = projectMemberService.cancel(projectMemberId);
         return Api.OK(result);
     }
 
+    @Operation(summary = "게시글 참여 확인 API", description = "게시글의 작성자는 참여 신청에 대한 승낙 혹은 거절을 선택한다.")
     @PatchMapping("check/{projectMemberId}")
     public Api<ProjectMemberResponse> checkApply(
             @PathVariable("projectMemberId") Long projectMemberId,
