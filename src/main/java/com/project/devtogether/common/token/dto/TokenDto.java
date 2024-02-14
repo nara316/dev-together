@@ -3,13 +3,13 @@ package com.project.devtogether.common.token.dto;
 import java.time.LocalDateTime;
 
 public record TokenDto(
-        String token,
-        LocalDateTime expiredAt
+        String accessToken,
+        String refreshToken
 ) {
-    public static TokenDto of(String jwtToken, LocalDateTime expiredDateTime) {
+    public static TokenDto of(String accessToken, String refreshToken) {
         return new TokenDto(
-                jwtToken,
-                expiredDateTime
+                accessToken,
+                refreshToken
         );
     }
 }

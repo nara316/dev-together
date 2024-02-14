@@ -49,7 +49,10 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        TokenDto token = jwtTokenProvider.issueToken(authentication);
+        TokenDto token = new TokenDto(
+                jwtTokenProvider.issueToken(authentication),
+                jwtTokenProvider.issueRefreshToken(authentication)
+        );
 
         Member member = memberRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));

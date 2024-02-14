@@ -19,8 +19,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,13 +32,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
+
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${token.secret.key}")
     private String secretKey;
 
     @Value("${token.access-token.plus-hour}")
     private Long accessPlusHour;
+
+    @Value("${token.refresh-token.plus-hour}")
+    private Long refreshPlusHour;
 
     private Key key;
 
@@ -45,7 +54,7 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenDto issueToken(Authentication authentication) {
+    public String issueToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -63,10 +72,29 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        return TokenDto.of(
-                accessToken,
-                expiredLocalDateTime
+        return accessToken;
+    }
+
+    public String issueRefreshToken(Authentication authentication) {
+        Claims claims = Jwts.claims().setSubject(authentication.getName());
+        LocalDateTime expiredLocalDateTime = LocalDateTime.now().plusHours(refreshPlusHour);
+        java.util.Date expiredAt = java.sql.Date.from(expiredLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        String refreshToken = Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(expiredAt)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        //redis에 저장
+        redisTemplate.opsForValue().set(
+                authentication.getName(),
+                refreshToken,
+                refreshPlusHour,
+                TimeUnit.MICROSECONDS
         );
+
+        return refreshToken;
     }
 
     public boolean validateToken(String token) {
