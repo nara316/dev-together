@@ -84,6 +84,7 @@ public class Project {
         this.content = content;
         this.status = ProjectStatus.ENROLLING;
         this.recruitCapacity = recruitCapacity;
+        this.currentCapacity = 0;
         this.advertiseEndDate = advertisementEndDate;
         this.registeredAt = LocalDateTime.now();
         this.registeredBy = member.getNickName();

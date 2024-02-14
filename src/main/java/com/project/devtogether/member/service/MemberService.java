@@ -49,6 +49,7 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
         TokenDto token = new TokenDto(
                 jwtTokenProvider.issueToken(authentication),
                 jwtTokenProvider.issueRefreshToken(authentication)

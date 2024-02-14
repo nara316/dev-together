@@ -1,6 +1,5 @@
 package com.project.devtogether.project.domain.enums;
 
-import com.project.devtogether.common.error.ErrorCode;
 import com.project.devtogether.common.error.ProjectErrorCode;
 import com.project.devtogether.common.exception.ApiException;
 import java.util.Arrays;

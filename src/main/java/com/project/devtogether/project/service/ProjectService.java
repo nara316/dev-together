@@ -43,8 +43,8 @@ public class ProjectService {
         Member member = getReferenceBySecurity();
         LocalDateTime endDate = calculateAdvertiseEndDate(request.advertiseEndDate());
         Project project = Project.of(member, request.title(), request.content(), request.recruitCapacity(), endDate);
-        projectRepository.save(project);
         project.addCurrentCapacity();
+        projectRepository.save(project);
 
         List<String> skills = request.skills();
         for (String skill : skills) {
@@ -67,7 +67,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public Page<ProjectDto> readProjects(SearchType searchType, String searchValue, Pageable pageable
     ) {
-        if (searchValue.isBlank() || searchValue == null) {
+        if (searchValue == null || searchValue.isBlank()) {
             return projectRepository.findProjects(pageable);
         }
 

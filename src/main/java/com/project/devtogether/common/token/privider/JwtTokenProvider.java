@@ -76,22 +76,29 @@ public class JwtTokenProvider {
     }
 
     public String issueRefreshToken(Authentication authentication) {
-        Claims claims = Jwts.claims().setSubject(authentication.getName());
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+        Long userId = userDetail.getId();
         LocalDateTime expiredLocalDateTime = LocalDateTime.now().plusHours(refreshPlusHour);
         java.util.Date expiredAt = java.sql.Date.from(expiredLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         String refreshToken = Jwts.builder()
-                .setClaims(claims)
+                .setSubject(authentication.getName())
+                .claim("userId", userId)
+                .claim("auth", authorities)
                 .setExpiration(expiredAt)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        //redis에 저장
+        // redis에 저장
         redisTemplate.opsForValue().set(
                 authentication.getName(),
                 refreshToken,
                 refreshPlusHour,
-                TimeUnit.MICROSECONDS
+                TimeUnit.MILLISECONDS
         );
 
         return refreshToken;
