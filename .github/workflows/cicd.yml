@@ -27,6 +27,8 @@ jobs:
           spring.datasource.url: ${{ secrets.DATASOURCE_URL }}
           spring.datasource.username: ${{ secrets.DATASOURCE_USERNAME }}
           spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }}
+          spring.data.redis.host: ${{ secrets.REDIS_HOST }}
+          spring.data.redis.password: ${{ secrets.REDIS_PASSWORD }}
           token.secret.key: ${{ secrets.TOKEN_SECRET_KEY }}
 
       - name: Grant execute permission for gradlew

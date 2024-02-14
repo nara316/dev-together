@@ -17,8 +17,10 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
 
   data:
-    redis: localhost
-    port: 6379
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: 6379
+      password: ${SPRING_REDIS_PASSWORD}
 
 token:
   secret:
