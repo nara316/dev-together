@@ -1,4 +1,4 @@
-package com.project.devtogether.common.redis;
+package com.project.devtogether.common.redis.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

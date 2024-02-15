@@ -8,6 +8,7 @@ import com.project.devtogether.member.dto.MemberResponse;
 import com.project.devtogether.member.dto.MemberUpdateRequest;
 import com.project.devtogether.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,5 +63,12 @@ public class MemberController {
     public Api<MemberResponse> updateMe(@Valid @RequestBody MemberUpdateRequest request) {
         MemberResponse result = memberService.updateMe(request);
         return Api.OK(result);
+    }
+
+    @Operation(summary = "로그아웃 API")
+    @PatchMapping("/logout")
+    public Api<String> logout(HttpServletRequest request) {
+        memberService.logout(request);
+        return Api.OK("로그아웃이 성공적으로 완료되었습니다.");
     }
 }

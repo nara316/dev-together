@@ -1,6 +1,7 @@
 package com.project.devtogether.common.security;
 
 
+import com.project.devtogether.common.redis.service.RedisService;
 import com.project.devtogether.common.security.service.CustomUserDetailService;
 import com.project.devtogether.common.token.filter.JwtAuthenticationFilter;
 import com.project.devtogether.common.token.privider.JwtTokenProvider;
@@ -22,6 +23,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailService customUserDetailService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -47,7 +49,7 @@ public class SecurityConfig {
                 .userDetailsService(customUserDetailService)
 
                 .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                        new JwtAuthenticationFilter(jwtTokenProvider, redisService), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

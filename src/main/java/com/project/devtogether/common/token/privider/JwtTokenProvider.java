@@ -3,8 +3,8 @@ package com.project.devtogether.common.token.privider;
 import com.project.devtogether.common.error.ErrorCode;
 import com.project.devtogether.common.error.MemberErrorCode;
 import com.project.devtogether.common.exception.ApiException;
+import com.project.devtogether.common.redis.service.RedisService;
 import com.project.devtogether.common.security.user.CustomUserDetail;
-import com.project.devtogether.common.token.dto.TokenDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -15,15 +15,14 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,7 +34,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisService redisService;
 
     @Value("${token.secret.key}")
     private String secretKey;
@@ -93,13 +92,8 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        // redis에 저장
-        redisTemplate.opsForValue().set(
-                authentication.getName(),
-                refreshToken,
-                refreshPlusHour,
-                TimeUnit.MILLISECONDS
-        );
+        //refresh Token redis 저장 (key=email, value=refresh Token)
+        redisService.setValues(userDetail.getUsername(), refreshToken, Duration.ofMillis(refreshPlusHour));
 
         return refreshToken;
     }
@@ -150,6 +144,14 @@ public class JwtTokenProvider {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    public String resolveRefreshToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("refresh-token");
+        if (StringUtils.hasText(bearerToken)) {
+            return bearerToken;
         }
         return null;
     }

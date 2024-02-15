@@ -1,5 +1,6 @@
 package com.project.devtogether.common.token.filter;
 
+import com.project.devtogether.common.redis.service.RedisService;
 import com.project.devtogether.common.token.privider.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,19 +17,25 @@ import org.springframework.web.filter.GenericFilterBean;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
         //request header에서 Token 추출
-        String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
+        String accessToken = jwtTokenProvider.resolveToken((HttpServletRequest) request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        if (accessToken != null && jwtTokenProvider.validateToken(accessToken) && doNotLogout(accessToken)) {
             //token이 유효할 경우 Athentication 객체를 가지고와서 SecurityContext에 저장
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         chain.doFilter(request, response);
+    }
+
+    private boolean doNotLogout(String accessToken) {
+        String isLogout = redisService.getValues(accessToken);
+        return isLogout.equals("false");
     }
 }
