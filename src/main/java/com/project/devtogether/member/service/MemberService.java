@@ -18,8 +18,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -81,10 +79,8 @@ public class MemberService {
         return MemberResponse.of(member);
     }
 
-    @CacheEvict(value = "UserCacheStore", key = "#email")
     public MemberResponse updateMe(MemberUpdateRequest memberUpdateRequest) {
         Member member = getMemberBySecurity();
-        String email = member.getEmail();
         if (memberUpdateRequest.introduce() == null || memberUpdateRequest.introduce().isBlank()) {
             member.setNickName(memberUpdateRequest.nickName());
             return MemberResponse.of(member);
@@ -107,7 +103,7 @@ public class MemberService {
             redisService.deleteValues(email);
         }
         //로그아웃시 24시간동안 해당 유저의 accessToken을 블랙리스트에 추가하고 추후 해당 토큰으로 요청시 에러 반환
-        redisService.setValues(accessToken, "logout", Duration.ofMillis(60 * 60 * 24));
+        redisService.setValues(accessToken, "logout", Duration.ofHours(24));
 
     }
 
@@ -117,13 +113,7 @@ public class MemberService {
 
     private Member getMemberBySecurity() {
         String currentUserEmail = SecurityUtil.getCurrentUserEmail();
-        return getMemberBySecurityEmail(currentUserEmail);
-    }
-
-    @Cacheable(value = "UserCacheStore", key = "#email")
-    public Member getMemberBySecurityEmail(String email) {
-        Member member = memberRepository.findFirstByEmail(email)
+        return memberRepository.findFirstByEmail(currentUserEmail)
                 .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-        return member;
     }
 }

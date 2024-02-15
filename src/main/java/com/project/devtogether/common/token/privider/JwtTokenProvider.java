@@ -93,7 +93,7 @@ public class JwtTokenProvider {
                 .compact();
 
         //refresh Token redis 저장 (key=email, value=refresh Token)
-        redisService.setValues(userDetail.getUsername(), refreshToken, Duration.ofMillis(refreshPlusHour));
+        redisService.setValues(userDetail.getUsername(), refreshToken, Duration.ofHours(refreshPlusHour));
 
         return refreshToken;
     }
