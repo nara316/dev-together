@@ -14,6 +14,8 @@ import com.project.devtogether.member.dto.MemberUpdateRequest;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -74,8 +76,10 @@ public class MemberService {
         return MemberResponse.of(member);
     }
 
+    @CacheEvict(value = "UserCacheStore", key = "#email")
     public MemberResponse updateMe(MemberUpdateRequest memberUpdateRequest) {
         Member member = getMemberBySecurity();
+        String email = member.getEmail();
         if (memberUpdateRequest.introduce() == null || memberUpdateRequest.introduce().isBlank()) {
             member.setNickName(memberUpdateRequest.nickName());
             return MemberResponse.of(member);
@@ -91,7 +95,12 @@ public class MemberService {
 
     private Member getMemberBySecurity() {
         String currentUserEmail = SecurityUtil.getCurrentUserEmail();
-        Member member = memberRepository.findFirstByEmail(currentUserEmail)
+        return getMemberBySecurityEmail(currentUserEmail);
+    }
+
+    @Cacheable(value = "UserCacheStore", key = "#email")
+    public Member getMemberBySecurityEmail(String email) {
+        Member member = memberRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         return member;
     }
