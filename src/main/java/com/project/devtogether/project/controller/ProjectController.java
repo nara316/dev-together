@@ -60,17 +60,17 @@ public class ProjectController {
 
     @Operation(summary = "게시글 정보 수정 API")
     @PatchMapping("{id}")
-    public Api<ProjectResponse> updateProject(@PathVariable("id") Long id,
+    public Api<List<ProjectDto>> updateProject(@PathVariable("id") Long id,
                                               @Valid @RequestBody ProjectUpdateRequest request) {
-        ProjectResponse result = projectService.updateProject(id, request);
+        List<ProjectDto> result = projectService.updateProject(id, request);
         return Api.OK(result);
     }
 
     @Operation(summary = "게시글 기한 수정 API", description = "게시글 공고 기한을 늘린다.")
     @PatchMapping("{id}/{plusDate}")
-    public Api<ProjectResponse> updateProjectAdEndDate(
+    public Api<List<ProjectDto>> updateProjectAdEndDate(
             @PathVariable("id") Long id, @PathVariable("plusDate") Long plusDate) {
-        ProjectResponse result = projectService.updateProjectAdEndDate(id, plusDate);
+        List<ProjectDto> result = projectService.updateProjectAdEndDate(id, plusDate);
         return Api.OK(result);
     }
 

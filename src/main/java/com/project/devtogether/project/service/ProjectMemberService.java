@@ -1,7 +1,11 @@
 package com.project.devtogether.project.service;
 
+import static com.project.devtogether.common.redis.enums.RedisCache.PROJECT_REDIS_KEY;
+
 import com.project.devtogether.common.error.ProjectErrorCode;
 import com.project.devtogether.common.exception.ApiException;
+import com.project.devtogether.common.redis.config.ObjectSerializer;
+import com.project.devtogether.common.redis.service.RedisService;
 import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.member.domain.Member;
 import com.project.devtogether.member.domain.MemberRepository;
@@ -13,7 +17,10 @@ import com.project.devtogether.participant.dto.ProjectMemberResponse;
 import com.project.devtogether.participant.dto.ProjectMemberUpdateRequest;
 import com.project.devtogether.project.domain.Project;
 import com.project.devtogether.project.domain.enums.ProjectStatus;
+import com.project.devtogether.project.dto.ProjectDto;
 import com.project.devtogether.project.repository.ProjectRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +32,9 @@ public class ProjectMemberService {
 
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
-
     private final ProjectMemberRepository projectMemberRepository;
+    private final ObjectSerializer objectSerializer;
+    private final RedisService redisService;
 
     public ProjectMemberResponse apply(Long id) {
         Member member = getReferenceBySecurity();
@@ -51,6 +59,12 @@ public class ProjectMemberService {
 
     public ProjectMemberResponse checkApply(Long id, ParticipantUpdateStatus participantUpdateStatus,
                                                 ProjectMemberUpdateRequest projectMemberUpdateRequest) {
+
+        String redisKey = PROJECT_REDIS_KEY.getValue() + id;
+        Optional<List<ProjectDto>> cache = objectSerializer.getDataList(redisKey, List.class, ProjectDto.class);
+        if (cache.isPresent()) {
+            redisService.deleteValues(redisKey);
+        }
 
         Member member = getReferenceBySecurity();
         ProjectMember projectMember = getProjectMemberById(id);

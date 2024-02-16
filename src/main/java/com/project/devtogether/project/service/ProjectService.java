@@ -1,7 +1,12 @@
 package com.project.devtogether.project.service;
 
+import static com.project.devtogether.common.redis.enums.RedisCache.PROJECT_REDIS_KEY;
+import static com.project.devtogether.common.redis.enums.RedisCache.REDIS_DURATION;
+
 import com.project.devtogether.common.error.ProjectErrorCode;
 import com.project.devtogether.common.exception.ApiException;
+import com.project.devtogether.common.redis.config.ObjectSerializer;
+import com.project.devtogether.common.redis.service.RedisService;
 import com.project.devtogether.common.security.util.SecurityUtil;
 import com.project.devtogether.member.domain.Member;
 import com.project.devtogether.member.domain.MemberRepository;
@@ -22,6 +27,7 @@ import com.project.devtogether.skill.domain.SkillRepository;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +44,8 @@ public class ProjectService {
     private final SkillRepository skillRepository;
     private final ProjectSkillRepository projectSkillRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ObjectSerializer objectSerializer;
+    private final RedisService redisService;
 
     public ProjectResponse register(ProjectRegisterRequest request) {
         Member member = getReferenceBySecurity();
@@ -61,7 +69,15 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<ProjectDto> readProject(Long id) {
-        return projectRepository.findProject(id);
+        String redisKey = PROJECT_REDIS_KEY.getValue() + id;
+        Optional<List<ProjectDto>> cache = objectSerializer.getDataList(redisKey, List.class, ProjectDto.class);
+        if (cache.isPresent()) {
+            return cache.get();
+        }
+
+        List<ProjectDto> response = projectRepository.findProject(id);
+        objectSerializer.saveData(redisKey, response, Integer.parseInt(REDIS_DURATION.getValue()));
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -81,7 +97,14 @@ public class ProjectService {
         };
     }
 
-    public ProjectResponse updateProject(Long id, ProjectUpdateRequest request) {
+    //redis 삭제 후 다시 저장
+    public List<ProjectDto> updateProject(Long id, ProjectUpdateRequest request) {
+        String redisKey = PROJECT_REDIS_KEY.getValue() + id;
+        Optional<List<ProjectDto>> cache = objectSerializer.getDataList(redisKey, List.class, ProjectDto.class);
+        if (cache.isPresent()) {
+            redisService.deleteValues(redisKey);
+        }
+
         Member member = getReferenceBySecurity();
         Project project = getProjectById(id);
         checkQualifiedBySecurity(member.getId(), project.getMember().getId());
@@ -101,20 +124,35 @@ public class ProjectService {
             projectSkillRepository.save(projectSkill);
         }
 
-        return ProjectResponse.of(project);
+        List<ProjectDto> response = List.of(ProjectDto.of(project));
+        objectSerializer.saveData(redisKey, response, Integer.parseInt(REDIS_DURATION.getValue()));
+        return response;
     }
 
-    public ProjectResponse updateProjectAdEndDate(Long id, Long plusDate) {
+    public List<ProjectDto> updateProjectAdEndDate(Long id, Long plusDate) {
+        String redisKey = PROJECT_REDIS_KEY.getValue() + id;
+        Optional<List<ProjectDto>> cache = objectSerializer.getDataList(redisKey, List.class, ProjectDto.class);
+        if (cache.isPresent()) {
+            redisService.deleteValues(redisKey);
+        }
         Member member = getReferenceBySecurity();
         Project project = getProjectById(id);
         checkQualifiedBySecurity(member.getId(), project.getMember().getId());
 
         LocalDateTime previousEndDate = project.getAdvertiseEndDate();
         project.setAdvertiseEndDate(previousEndDate.plusDays(plusDate));
-        return ProjectResponse.of(project);
+
+        List<ProjectDto> response = List.of(ProjectDto.of(project));
+        objectSerializer.saveData(redisKey, response, Integer.parseInt(REDIS_DURATION.getValue()));
+        return response;
     }
 
     public void deleteProject(Long id) {
+        String redisKey = PROJECT_REDIS_KEY.getValue() + id;
+        Optional<List<ProjectDto>> cache = objectSerializer.getDataList(redisKey, List.class, ProjectDto.class);
+        if (cache.isPresent()) {
+            redisService.deleteValues(redisKey);
+        }
         Member member = getReferenceBySecurity();
         Project project = getProjectById(id);
         checkQualifiedBySecurity(member.getId(), project.getMember().getId());

@@ -1,7 +1,11 @@
 package com.project.devtogether.member.service;
 
+import static com.project.devtogether.common.redis.enums.RedisCache.MEMBER_REDIS_KEY;
+import static com.project.devtogether.common.redis.enums.RedisCache.REDIS_DURATION;
+
 import com.project.devtogether.common.error.MemberErrorCode;
 import com.project.devtogether.common.exception.ApiException;
+import com.project.devtogether.common.redis.config.ObjectSerializer;
 import com.project.devtogether.common.redis.service.RedisService;
 import com.project.devtogether.common.security.user.CustomUserDetail;
 import com.project.devtogether.common.security.util.SecurityUtil;
@@ -16,6 +20,7 @@ import com.project.devtogether.member.dto.MemberUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,6 +41,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ObjectSerializer objectSerializer;
 
     public MemberResponse register(MemberRegisterRequest memberRegisterRequest) {
         if (isDuplicatedEmail(memberRegisterRequest.email())) {
@@ -68,26 +74,54 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberResponse readMember(Long id) {
+        String redisKey = MEMBER_REDIS_KEY.getValue() + id;
+        Optional<MemberResponse> cache = objectSerializer.getData(redisKey, MemberResponse.class);
+        if (cache.isPresent()) {
+            return cache.get();
+        }
+
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-        return MemberResponse.of(member);
+
+        MemberResponse response = MemberResponse.of(member);
+        objectSerializer.saveData(redisKey, response, Integer.parseInt(REDIS_DURATION.getValue()));
+        return response;
     }
 
     @Transactional(readOnly = true)
     public MemberResponse readMe() {
-        Member member = getMemberBySecurity();
-        return MemberResponse.of(member);
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        String redisKey = MEMBER_REDIS_KEY.getValue() + currentUserId;
+        Optional<MemberResponse> cache = objectSerializer.getData(redisKey, MemberResponse.class);
+        if (cache.isPresent()) {
+            return cache.get();
+        }
+
+        Member member = getMemberBySecurityId(currentUserId);
+
+        MemberResponse response = MemberResponse.of(member);
+        objectSerializer.saveData(redisKey, response, Integer.parseInt(REDIS_DURATION.getValue()));
+        return response;
     }
 
+    //수정시 cache 값 삭제 및 다시 저장
     public MemberResponse updateMe(MemberUpdateRequest memberUpdateRequest) {
-        Member member = getMemberBySecurity();
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        String redisKey = MEMBER_REDIS_KEY.getValue() + currentUserId;
+        Optional<MemberResponse> cache = objectSerializer.getData(redisKey, MemberResponse.class);
+        if (cache.isPresent()) {
+            redisService.deleteValues(redisKey);
+        }
+        Member member = getMemberBySecurityId(currentUserId);
         if (memberUpdateRequest.introduce() == null || memberUpdateRequest.introduce().isBlank()) {
             member.setNickName(memberUpdateRequest.nickName());
             return MemberResponse.of(member);
         }
         member.setNickName(memberUpdateRequest.nickName());
         member.setIntroduce(memberUpdateRequest.introduce());
-        return MemberResponse.of(member);
+        MemberResponse response = MemberResponse.of(member);
+        objectSerializer.saveData(redisKey, response, Integer.parseInt(REDIS_DURATION.getValue()));
+        return response;
     }
 
     public void logout(HttpServletRequest request) {
@@ -111,9 +145,12 @@ public class MemberService {
         return memberRepository.findFirstByEmail(email).isPresent();
     }
 
-    private Member getMemberBySecurity() {
-        String currentUserEmail = SecurityUtil.getCurrentUserEmail();
-        return memberRepository.findFirstByEmail(currentUserEmail)
-                .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+    private Member getMemberBySecurityId(Long currentUserId) {
+        return memberRepository.getMemberById(currentUserId);
+    }
+
+    private boolean isValidateCacheExist(String redisKey) {
+        Optional<MemberResponse> cache = objectSerializer.getData(redisKey, MemberResponse.class);
+        return cache.isPresent();
     }
 }
