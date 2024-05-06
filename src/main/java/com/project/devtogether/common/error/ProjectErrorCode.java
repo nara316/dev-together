@@ -24,7 +24,9 @@ public enum ProjectErrorCode implements ErrorCodeIfs{
     PROJECT_MEMBER_CANNOT_APPLY_NOT_ENROLLING(
             HttpStatus.BAD_REQUEST.value(), 4403, "모집중 외의 게시글은 신청할 수 없습니다"),
     PROJECT_MEMBER_CANNOT_UPDATE_NOT_APPLIED(
-            HttpStatus.BAD_REQUEST.value(), 4402, "신청단계 외는 변경할 수 없습니다."),
+            HttpStatus.BAD_REQUEST.value(), 4404, "신청단계 외는 변경할 수 없습니다."),
+    PROJECT_MEMBER_OPTIMISTIC_LOCK_ERROR(
+            HttpStatus.BAD_REQUEST.value(), 4405, "신청 처리 중 낙관적 락 에러 발생."),
     ;
 
     private final Integer HttpStatusCode;

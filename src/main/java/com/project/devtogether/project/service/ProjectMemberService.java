@@ -22,6 +22,7 @@ import com.project.devtogether.project.repository.ProjectRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,13 +75,18 @@ public class ProjectMemberService {
         ParticipantStatus.checkStatusIsApplied(projectMember.getStatus());
 
         projectMember.setComment(projectMemberUpdateRequest.comment());
-        switch (participantUpdateStatus) {
-            case ACCEPTED -> {
-                projectMember.setStatus(ParticipantStatus.ACCEPTED);
-                project.addCurrentCapacity();
-            }
-            case REJECTED -> projectMember.setStatus(ParticipantStatus.REJECTED);
-        };
+
+        try {
+            switch (participantUpdateStatus) {
+                case ACCEPTED -> {
+                    projectMember.setStatus(ParticipantStatus.ACCEPTED);
+                    project.addCurrentCapacity();
+                }
+                case REJECTED -> projectMember.setStatus(ParticipantStatus.REJECTED);
+            };
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw new ApiException(ProjectErrorCode.PROJECT_MEMBER_OPTIMISTIC_LOCK_ERROR);
+        }
         return ProjectMemberResponse.of(projectMember);
     }
 
